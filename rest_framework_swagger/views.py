@@ -139,4 +139,4 @@ class SwaggerApiView(APIDocView):
     def get_api_for_resource(self, filter_path):
         urlparser = UrlParser()
         urlconf = getattr(self.request, "urlconf", None)
-        return urlparser.get_apis(urlconf=urlconf, filter_path=filter_path)
+        return urlparser.get_apis(urlconf=urlconf, filter_path=filter_path, exclude_names=SWAGGER_SETTINGS.get('exclude_names'))
