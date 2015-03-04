@@ -12,7 +12,7 @@ from .apidocview import APIDocView
 
 class UrlParser(object):
 
-    def get_apis(self, patterns=None, urlconf=None, filter_path=None, exclude_namespaces=[]):
+    def get_apis(self, patterns=None, urlconf=None, filter_path=None, exclude_names=[], exclude_namespaces=[]):
         """
         Returns all the DRF APIViews found in the project URLs
 
@@ -32,6 +32,7 @@ class UrlParser(object):
         apis = self.__flatten_patterns_tree__(
             patterns,
             filter_path=filter_path,
+            exclude_names=exclude_names,
             exclude_namespaces=exclude_namespaces,
         )
         if filter_path is not None:
@@ -121,7 +122,7 @@ class UrlParser(object):
             'callback': callback,
         }
 
-    def __flatten_patterns_tree__(self, patterns, prefix='', filter_path=None, exclude_namespaces=[]):
+    def __flatten_patterns_tree__(self, patterns, prefix='', filter_path=None, exclude_names=[], exclude_namespaces=[]):
         """
         Uses recursion to flatten url tree.
 
@@ -132,6 +133,9 @@ class UrlParser(object):
 
         for pattern in patterns:
             if isinstance(pattern, RegexURLPattern):
+                if pattern.name in exclude_names:
+                    continue
+
                 endpoint_data = self.__assemble_endpoint_data__(pattern, prefix, filter_path=filter_path)
 
                 if endpoint_data is None:
@@ -149,6 +153,7 @@ class UrlParser(object):
                     pattern.url_patterns,
                     pref,
                     filter_path=filter_path,
+                    exclude_names=exclude_names,
                     exclude_namespaces=exclude_namespaces,
                 ))
 
